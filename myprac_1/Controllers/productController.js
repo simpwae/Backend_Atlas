@@ -39,30 +39,52 @@ export const getAllProducts = async (req, res) => {
 };
 export const updateProduct = async (req, res) => {
   try {
-    const id = req.params;
+    const id = req.params.id;
     const isExist = await product.findById({ _id: id });
-    if(!isExist){
+    if (!isExist) {
       return res.json({
-        success:false,
-        message:"Product not found",
-      })
+        success: false,
+        message: "Product not found",
+      });
     }
-
-    const { title, description, price } = req.body;
-  await product.findByIdAndUpdate({
-    _id: id},
-    {
-      $set: {
-        title: title,
-        description: description,
-        price: price,
+    await product.findByIdAndUpdate(
+      {
+        _id: id,
       },
-    }
-  )
+      req.body
+    );
+    res.json({
+      success: true,
+      message: "Product updated successfully",
+    });
   } catch (error) {
     return res.json({
       success: false,
       message: "Failed to update product",
+      error: error.message,
+    });
+  }
+};
+export const deleteProduct = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const isExist = await product.findById({ _id: id });
+    if (!isExist) {
+      return res.json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+    const deleteProduct = await product.deleteOne({ _id: id });
+    res.json({
+      success: true,
+      message: "Product deleted successfully",
+      data: deleteProduct,
+    });
+  } catch (error) {
+    return res.json({
+      success: false,
+      message: "Failed to delete product",
       error: error.message,
     });
   }
