@@ -1,3 +1,4 @@
+import { JsonWebTokenError } from "jsonwebtoken";
 import { User } from "../schemas/userSchema.js";
 import bcrypt from "bcrypt";
 export const addUserController = async (req, res) => {
@@ -75,7 +76,6 @@ export const updateUser = async (req, res) => {
   }
 };
 
-
 export const deleteUser = async (req, res) => {
   try {
     const id = req.params.userId;
@@ -103,3 +103,40 @@ export const deleteUser = async (req, res) => {
   }
 };
 
+export const login = async (req, res) => {
+  try {
+    const userExist = await User.findOne({ email: req.body.email });
+    if (!req.body.email) {
+      return res.json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+    if (!req.body.password) {
+      return res.json({
+        success: false,
+        message: "password is required",
+      });
+    }
+    if (!userExist) {
+      return res.json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    const isMatch = await bcrypt.compare(req.body.password, userExist.password);
+    console.log(isMatch);
+    if (!isMatch) {
+      return res.json({
+        success: false,
+        message: "invalid Credantials",
+      });
+    }
+    const jwtoken=await jwt
+  } catch (error) {
+    return res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
