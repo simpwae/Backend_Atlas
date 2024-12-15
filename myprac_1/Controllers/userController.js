@@ -1,4 +1,4 @@
-import { JsonWebTokenError } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { User } from "../schemas/userSchema.js";
 import bcrypt from "bcrypt";
 export const addUserController = async (req, res) => {
@@ -132,7 +132,17 @@ export const login = async (req, res) => {
         message: "invalid Credantials",
       });
     }
-    const jwtoken=await jwt
+    const jwtoken = await jwt.sign(
+      {
+        userId: userExist._id,
+      },
+      process.env.SECRET
+    );
+    return res.json({
+      success: true,
+      message: "logged in Successfully",
+      data: { ...userExist, jwtoken },
+    });
   } catch (error) {
     return res.json({
       success: false,
